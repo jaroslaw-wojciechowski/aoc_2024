@@ -1,31 +1,39 @@
 mod utils;
 
-use std::collections::HashMap;
-
 use utils::read_lines;
 
 // const FILE_NAME: &str = "src/inputs/input-example.txt";
 const FILE_NAME: &str = "src/inputs/01-1.txt";
 
 fn main() {
-    let result = parse_file(FILE_NAME, 2020);
-    println!("{result}");
+    let (left, right): (Vec<i32>, Vec<i32>) = parse_file(FILE_NAME);
+    let result = calculate_result((left, right));
+
+    println!("Result: {}", result);
 }
 
-fn parse_file(file_name: &str, target: i32) -> i32 {
-    let mut num_map: HashMap<i32, i32> = HashMap::new();
+fn parse_file(file_name: &str) -> (Vec<i32>, Vec<i32>) {
+    let mut left: Vec<i32> = Vec::new();
+    let mut right: Vec<i32> = Vec::new();
 
     if let Ok(lines) = read_lines(file_name) {
         for line in lines.flatten() {
-            let current: i32 = line.trim().parse::<i32>().unwrap();
-            let diff: i32 = target - current;
-
-            if num_map.contains_key(&current) {
-                return current * num_map.get(&current).unwrap();
-            } else {
-                num_map.insert(diff, current);
-            }
+            let input: (&str, &str) = line.split_once("   ").unwrap();
+            left.push(input.0.parse().unwrap());
+            right.push(input.1.parse().unwrap());
         }
     }
-    return 0;
+
+    return (left, right);
+}
+
+fn calculate_result((mut left, mut right): (Vec<i32>, Vec<i32>)) -> u32 {
+    let mut sum: u32 = 0;
+    left.sort();
+    right.sort();
+
+    for (index, left_num) in left.into_iter().enumerate() {
+        sum += right[index].abs_diff(left_num);
+    }
+    sum
 }
