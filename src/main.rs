@@ -1,50 +1,137 @@
 mod utils;
 
-use regex::Regex;
 use utils::read_lines;
 
+// const SIZE: usize = 10;
+const SIZE: usize = 140;
 // const FILE_NAME: &str = "src/inputs/input-example.txt";
-const FILE_NAME: &str = "src/inputs/03-1.txt";
+const FILE_NAME: &str = "src/inputs/04-1.txt";
 
 fn main() {
-    parse_file(FILE_NAME);
+    let matrix = write_matrix();
+    // print_matrix(&matrix);
+    traverse_matrix(&matrix);
 }
 
-fn parse_file(file_name: &str) {
-    let re = Regex::new(r"(mul\(\d+,\d+\)|don't\(\)|do\(\))").unwrap();
+fn write_matrix() -> [[char; SIZE]; SIZE] {
+    let mut matrix: [[char; SIZE]; SIZE] = [[' '; SIZE]; SIZE];
 
+    let file_name = FILE_NAME;
     if let Ok(lines) = read_lines(file_name) {
-        let mut result = 0;
-        let mut is_on = true;
-        for line in lines.flatten() {
-            for x in re.find_iter(&line).map(|i| i.as_str()) {
-                match x {
-                    x if x.contains("mul") => result += mul_operation(x, is_on),
-                    x if x.contains("don't") => {
-                        println!("OFF: {}", x);
-                        is_on = false;
+        for (y, line) in lines.flatten().enumerate() {
+            for (x, char) in line.chars().enumerate() {
+                matrix[x][y] = char;
+            }
+        }
+    }
+    return matrix;
+}
+
+fn traverse_matrix(matrix: &[[char; SIZE]; SIZE]) {
+    let mut counter = 0;
+
+    for y in 0..SIZE {
+        for x in 0..SIZE {
+            if matrix[x][y] == 'X' {
+                // test top
+                if y >= 3 {
+                    let mut temp = String::new();
+                    temp.push(matrix[x][y]);
+                    temp.push(matrix[x][y - 1]);
+                    temp.push(matrix[x][y - 2]);
+                    temp.push(matrix[x][y - 3]);
+                    if temp.eq("XMAS") {
+                        counter += 1;
                     }
-                    x if x.contains("do") => {
-                        println!("ON: {}", x);
-                        is_on = true;
+                }
+                // test top-right
+                if y >= 3 && x < SIZE - 3 {
+                    let mut temp = String::new();
+                    temp.push(matrix[x][y]);
+                    temp.push(matrix[x + 1][y - 1]);
+                    temp.push(matrix[x + 2][y - 2]);
+                    temp.push(matrix[x + 3][y - 3]);
+                    if temp.eq("XMAS") {
+                        counter += 1;
                     }
-                    _ => println!("ERROR"),
+                }
+                // test right
+                if x < SIZE - 3 {
+                    let mut temp = String::new();
+                    temp.push(matrix[x][y]);
+                    temp.push(matrix[x + 1][y]);
+                    temp.push(matrix[x + 2][y]);
+                    temp.push(matrix[x + 3][y]);
+                    if temp.eq("XMAS") {
+                        counter += 1;
+                    }
+                }
+                // test down-right
+                if y < SIZE - 3 && x < SIZE - 3 {
+                    let mut temp = String::new();
+                    temp.push(matrix[x][y]);
+                    temp.push(matrix[x + 1][y + 1]);
+                    temp.push(matrix[x + 2][y + 2]);
+                    temp.push(matrix[x + 3][y + 3]);
+                    if temp.eq("XMAS") {
+                        counter += 1;
+                    }
+                }
+                // test down
+                if y < SIZE - 3 {
+                    let mut temp = String::new();
+                    temp.push(matrix[x][y]);
+                    temp.push(matrix[x][y + 1]);
+                    temp.push(matrix[x][y + 2]);
+                    temp.push(matrix[x][y + 3]);
+                    if temp.eq("XMAS") {
+                        counter += 1;
+                    }
+                }
+                // test down-left
+                if y < SIZE - 3 && x >= 3 {
+                    let mut temp = String::new();
+                    temp.push(matrix[x][y]);
+                    temp.push(matrix[x - 1][y + 1]);
+                    temp.push(matrix[x - 2][y + 2]);
+                    temp.push(matrix[x - 3][y + 3]);
+                    if temp.eq("XMAS") {
+                        counter += 1;
+                    }
+                }
+                // test left
+                if x >= 3 {
+                    let mut temp = String::new();
+                    temp.push(matrix[x][y]);
+                    temp.push(matrix[x - 1][y]);
+                    temp.push(matrix[x - 2][y]);
+                    temp.push(matrix[x - 3][y]);
+                    if temp.eq("XMAS") {
+                        counter += 1;
+                    }
+                }
+                // test top-left
+                if y >= 3 && x >= 3 {
+                    let mut temp = String::new();
+                    temp.push(matrix[x][y]);
+                    temp.push(matrix[x - 1][y - 1]);
+                    temp.push(matrix[x - 2][y - 2]);
+                    temp.push(matrix[x - 3][y - 3]);
+                    if temp.eq("XMAS") {
+                        counter += 1;
+                    }
                 }
             }
         }
-        println!("{result}");
     }
+    println!("result: {}", counter);
 }
 
-fn mul_operation(mul: &str, is_on: bool) -> i32 {
-    let mut result: i32 = 0;
-    if is_on {
-        println!("calc for: {}", mul);
-        let re = Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
-        for (_, [left, right]) in re.captures_iter(&mul).map(|c| c.extract()) {
-            result = left.parse::<i32>().unwrap() * right.parse::<i32>().unwrap();
-            return result;
+fn print_matrix(matrix: &[[char; SIZE]; SIZE]) {
+    for y in 0..SIZE {
+        for x in 0..SIZE {
+            print!("{}", matrix[x][y]);
         }
+        println!();
     }
-    return result;
 }
