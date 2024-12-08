@@ -25,48 +25,36 @@ fn count_hash(coords_map: HashMap<char, Vec<(i32, i32)>>, matrix: &mut [[char; S
                 let x_diff = (vec[i].0 - vec[j].0).abs();
                 let y_diff = (vec[i].1 - vec[j].1).abs();
 
-                let antinode_1_x = match (vec[i].0, vec[j].0) {
+                let an1_x = match (vec[i].0, vec[j].0) {
                     (x1, x2) if x1 > x2 => x1 + x_diff,
                     (x1, x2) if x1 < x2 => x1 - x_diff,
                     (x1, x2) if x1 == x2 => x1,
                     _ => panic!("something wend wrong"),
                 };
 
-                let antinode_1_y = match (vec[i].1, vec[j].1) {
+                let an1_y = match (vec[i].1, vec[j].1) {
                     (y1, y2) if y1 > y2 => y1 + y_diff,
                     (y1, y2) if y1 < y2 => y1 - y_diff,
                     (y1, y2) if y1 == y2 => y1,
                     _ => panic!("something wend wrong"),
                 };
 
-                let antinode_2_x = match (vec[i].0, vec[j].0) {
+                let an2_x = match (vec[i].0, vec[j].0) {
                     (x1, x2) if x2 > x1 => x2 + x_diff,
                     (x1, x2) if x2 < x1 => x2 - x_diff,
                     (x1, x2) if x2 == x1 => x2,
                     _ => panic!("something wend wrong"),
                 };
 
-                let antinode_2_y = match (vec[i].1, vec[j].1) {
+                let an2_y = match (vec[i].1, vec[j].1) {
                     (y1, y2) if y2 > y1 => y2 + y_diff,
                     (y1, y2) if y2 < y1 => y2 - y_diff,
                     (y1, y2) if y2 == y1 => y2,
                     _ => panic!("something wend wrong"),
                 };
 
-                put_antinode(
-                    antinode_1_x,
-                    antinode_1_y,
-                    matrix,
-                    &mut counter,
-                    &mut overlap_vec,
-                );
-                put_antinode(
-                    antinode_2_x,
-                    antinode_2_y,
-                    matrix,
-                    &mut counter,
-                    &mut overlap_vec,
-                );
+                put_antinode(an1_x, an1_y, matrix, &mut counter, &mut overlap_vec);
+                put_antinode(an2_x, an2_y, matrix, &mut counter, &mut overlap_vec);
             }
         }
     }
@@ -79,7 +67,7 @@ fn put_antinode(
     matrix: &mut [[char; SIZE]; SIZE],
     counter: &mut i32,
     overlap_vec: &mut Vec<(i32, i32)>,
-) {
+) -> bool {
     if (x < SIZE as i32 && x >= 0) && (y < SIZE as i32 && y >= 0) {
         let current_char = matrix[x as usize][y as usize];
 
@@ -90,6 +78,7 @@ fn put_antinode(
             }
             '#' => println!("overlap #"),
             _ => {
+                println!("overlap other");
                 if overlap_vec.contains(&(x, y)) {
                     println!("2nd overlap other");
                 } else {
@@ -99,6 +88,9 @@ fn put_antinode(
                 }
             }
         }
+        return true;
+    } else {
+        return false;
     }
 }
 
