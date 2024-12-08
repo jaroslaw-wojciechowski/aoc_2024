@@ -4,10 +4,10 @@ use std::collections::HashMap;
 
 use utils::read_lines;
 
-const SIZE: usize = 12;
-// const SIZE: usize = 50;
-const FILE_NAME: &str = "src/inputs/input-example.txt";
-// const FILE_NAME: &str = "src/inputs/08-1.txt";
+// const SIZE: usize = 12;
+const SIZE: usize = 50;
+// const FILE_NAME: &str = "src/inputs/input-example.txt";
+const FILE_NAME: &str = "src/inputs/08-1.txt";
 
 fn main() {
     let (mut matrix, init_count) = write_matrix();
