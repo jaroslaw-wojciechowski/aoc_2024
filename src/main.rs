@@ -10,22 +10,8 @@ const SIZE: usize = 54;
 const FILE_NAME: &str = "src/inputs/10-1.txt";
 
 fn main() {
-    let mut matrix = write_matrix();
-    // search(&mut matrix, (2, 5), 1); => 1
-    // let mut coord_set: HashSet<(usize, usize)> = HashSet::new();
-    // search(&mut matrix, &mut coord_set, (5, 5), 1); //=> 3
-    // println!("coord_set: {:?}", coord_set);
+    let matrix = write_matrix();
     traverse_matrix(matrix);
-    // print_matrix(&matrix);
-}
-
-fn print_matrix(matrix: &[[char; SIZE]; SIZE]) {
-    for y in 0..SIZE {
-        for x in 0..SIZE {
-            print!("{}", matrix[x][y]);
-        }
-        println!();
-    }
 }
 
 fn write_matrix() -> [[char; SIZE]; SIZE] {
@@ -49,7 +35,6 @@ fn traverse_matrix(mut matrix: [[char; SIZE]; SIZE]) {
             if matrix[x][y].to_digit(10).unwrap() == 0 {
                 let mut coord_set: HashSet<(usize, usize)> = HashSet::new();
                 search(&mut matrix, &mut coord_set, (x, y), 1);
-                // println!("hashset: {:?}", coord_set);
                 result += coord_set.len();
             }
         }
