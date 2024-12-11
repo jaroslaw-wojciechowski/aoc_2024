@@ -1,82 +1,82 @@
-mod utils;
-
-use utils::read_lines;
-
-// const SIZE: usize = 8;
-const SIZE: usize = 54;
-// const FILE_NAME: &str = "src/inputs/input-example.txt";
-const FILE_NAME: &str = "src/inputs/10-1.txt";
+use std::collections::HashMap;
 
 fn main() {
-    let matrix = write_matrix();
-    traverse_matrix(matrix);
+    let input = "475449 2599064 213 0 2 65 5755 51149";
+    // let input = String::from("125 17");
+    let mut map: HashMap<String, i32> = HashMap::new();
+    for i in input.split(" ").into_iter() {
+        if map.contains_key(&String::from(i)) {
+            let val = map.get(&String::from(i)).unwrap();
+            map.insert(String::from(i), val + 1);
+        } else {
+            map.insert(String::from(i), 1);
+        }
+    }
+
+    println!("init map: {:?}", map);
+
+    for i in 0..75 {
+        map = process_input(&map);
+        let sum: i64 = map.values().map(|&x| x as i64).sum();
+        // println!("iter: {} map len: {:?}; map: {:?}", i + 1, sum, map);
+        println!("iter: {} map len: {:?}", i + 1, sum);
+    }
 }
 
-fn write_matrix() -> [[char; SIZE]; SIZE] {
-    let mut matrix: [[char; SIZE]; SIZE] = [[' '; SIZE]; SIZE];
+fn process_input(in_map: &HashMap<String, i32>) -> HashMap<String, i32> {
+    let map = in_map.clone();
+    let mut out_map: HashMap<String, i32> = HashMap::new();
 
-    let file_name = FILE_NAME;
-    if let Ok(lines) = read_lines(file_name) {
-        for (y, line) in lines.flatten().enumerate() {
-            for (x, char) in line.chars().enumerate() {
-                matrix[x][y] = char;
-            }
+    for (key, val) in map.iter() {
+        if key.eq("0") {
+            let count: i32 = *out_map.get(&String::from("1")).unwrap_or(&0);
+            out_map.insert(String::from("1"), val.clone() + count);
+        } else if key.eq("1") {
+            let count: i32 = *out_map.get(&String::from("2024")).unwrap_or(&0);
+            out_map.insert(String::from("2024"), val.clone() + count);
+        } else if key.eq("20") {
+            let count: i32 = *out_map.get(&String::from("2")).unwrap_or(&0);
+            out_map.insert(String::from("2"), val.clone() + count);
+            let count: i32 = *out_map.get(&String::from("0")).unwrap_or(&0);
+            out_map.insert(String::from("0"), val.clone() + count);
+        } else if key.eq("24") {
+            let count: i32 = *out_map.get(&String::from("2")).unwrap_or(&0);
+            out_map.insert(String::from("2"), val.clone() + count);
+            let count: i32 = *out_map.get(&String::from("4")).unwrap_or(&0);
+            out_map.insert(String::from("4"), val.clone() + count);
+        } else if key.eq("2024") {
+            let count: i32 = *out_map.get(&String::from("20")).unwrap_or(&0);
+            out_map.insert(String::from("20"), val.clone() + count);
+            let count: i32 = *out_map.get(&String::from("24")).unwrap_or(&0);
+            out_map.insert(String::from("24"), val.clone() + count);
+        } else if key.len() % 2 == 0 {
+            let (l, r) = split_stone(key.clone());
+            let count: i32 = *out_map.get(&l).unwrap_or(&0);
+            out_map.insert(l, val.clone() + count);
+            let count: i32 = *out_map.get(&r).unwrap_or(&0);
+            out_map.insert(r, val.clone() + count);
+        } else if key.len() % 2 != 0 {
+            let mul_op = mul_stone(key.clone());
+            let count: i32 = *out_map.get(&mul_op).unwrap_or(&0);
+            out_map.insert(mul_op, val.clone() + count);
         }
     }
-    return matrix;
+
+    return out_map;
 }
 
-fn traverse_matrix(mut matrix: [[char; SIZE]; SIZE]) {
-    let mut result = 0;
-    for y in 0..SIZE {
-        for x in 0..SIZE {
-            if matrix[x][y].to_digit(10).unwrap() == 0 {
-                let mut coord_vec: Vec<(usize, usize)> = Vec::new();
-                search(&mut matrix, &mut coord_vec, (x, y), 1);
-                result += coord_vec.len();
-            }
-        }
-    }
-    println!("result: {}", result);
+fn mul_stone(s: String) -> String {
+    let big_num: i64 = s.parse().unwrap();
+    let sum: i64 = big_num * 2024;
+    return sum.to_string();
 }
 
-fn search(
-    matrix: &mut [[char; SIZE]; SIZE],
-    coord_vec: &mut Vec<(usize, usize)>,
-    coords: (usize, usize),
-    hight: u32,
-) {
-    let (x, y) = coords;
-    // check top
-    if y > 0 && hight == matrix[x][y - 1].to_digit(10).unwrap() {
-        if hight == 9 {
-            coord_vec.push((x, y - 1));
-        } else {
-            search(matrix, coord_vec, (x, y - 1), hight + 1);
-        }
+fn split_stone(s: String) -> (String, String) {
+    let (left, mut right) = s.split_at(s.len() / 2);
+
+    right = right.trim_start_matches('0');
+    if right.len() == 0 {
+        right = "0";
     }
-    // check right
-    if x < SIZE - 1 && hight == matrix[x + 1][y].to_digit(10).unwrap() {
-        if hight == 9 {
-            coord_vec.push((x + 1, y));
-        } else {
-            search(matrix, coord_vec, (x + 1, y), hight + 1);
-        }
-    }
-    // check bot
-    if y < SIZE - 1 && hight == matrix[x][y + 1].to_digit(10).unwrap() {
-        if hight == 9 {
-            coord_vec.push((x, y + 1));
-        } else {
-            search(matrix, coord_vec, (x, y + 1), hight + 1);
-        }
-    }
-    // check left
-    if x > 0 && hight == matrix[x - 1][y].to_digit(10).unwrap() {
-        if hight == 9 {
-            coord_vec.push((x - 1, y));
-        } else {
-            search(matrix, coord_vec, (x - 1, y), hight + 1);
-        }
-    }
+    return (String::from(left), String::from(right));
 }
