@@ -1,94 +1,31 @@
-mod utils;
-
-use utils::read_lines;
-
-// const SIZE: usize = 10;
-const SIZE: usize = 140;
-// const FILE_NAME: &str = "src/inputs/input-example.txt";
-const FILE_NAME: &str = "src/inputs/12-1.txt";
+use num::integer::gcd;
 
 fn main() {
-    let matrix = write_matrix();
-    traverse_matrix(&matrix);
+    // Button A: X+94, Y+34
+    // Button B: X+22, Y+67
+    // Prize: X=8400, Y=5400
+    if is_valid(94, 22, 34, 67, 8400, 5400) {
+        find_cheapest(94, 22, 34, 67, 8400, 5400);
+    }
 }
 
-fn write_matrix() -> [[char; SIZE]; SIZE] {
-    let mut matrix: [[char; SIZE]; SIZE] = [[' '; SIZE]; SIZE];
+fn is_valid(x1: i64, x2: i64, y1: i64, y2: i64, target1: i64, target2: i64) -> bool {
+    target1 % gcd(x1, x2) == 0 && target2 % gcd(y1, y2) == 0
+}
 
-    let file_name = FILE_NAME;
-    if let Ok(lines) = read_lines(file_name) {
-        for (y, line) in lines.flatten().enumerate() {
-            for (x, char) in line.chars().enumerate() {
-                matrix[x][y] = char;
+fn find_cheapest(x1: i64, x2: i64, y1: i64, y2: i64, target1: i64, target2: i64) {
+    let mut i = 0;
+    while i * x2 < target1 {
+        let temp = target1 - i * x2;
+        if temp % x1 == 0 {
+            let first_multiplier = temp / x1;
+
+            if i * y2 + first_multiplier * y1 == target2 {
+                println!("{} + {}", first_multiplier, i);
+                println!("coins: {}", first_multiplier * 3 + i * 1);
+                break;
             }
         }
+        i += 1;
     }
-    return matrix;
-}
-
-fn traverse_matrix(matrix: &[[char; SIZE]; SIZE]) {
-    let mut visited: Vec<(usize, usize)> = Vec::new();
-    let mut diff = 0;
-    let mut result = 0;
-
-    for y in 0..SIZE {
-        for x in 0..SIZE {
-            if !visited.contains(&(x, y)) {
-                let wynik = bfs(&matrix, &mut visited, x, y);
-                result += (visited.len() - diff) * wynik as usize;
-                println!("visited: {} * wynik: {}", visited.len() - diff, wynik);
-                diff = visited.len();
-            }
-        }
-    }
-    println!("result {}", result);
-}
-
-fn bfs(
-    matrix: &[[char; SIZE]; SIZE],
-    visited: &mut Vec<(usize, usize)>,
-    x: usize,
-    y: usize,
-) -> i32 {
-    let mut fields: Vec<(usize, usize)> = Vec::new();
-    let mut count: i32 = 0;
-
-    if visited.contains(&(x, y)) {
-        return 0;
-    }
-    visited.push((x, y));
-
-    if y > 0 {
-        fields.push((x, y - 1));
-    } else {
-        count += 1;
-    }
-
-    if y < SIZE - 1 {
-        fields.push((x, y + 1));
-    } else {
-        count += 1;
-    }
-
-    if x > 0 {
-        fields.push((x - 1, y));
-    } else {
-        count += 1;
-    }
-
-    if x < SIZE - 1 {
-        fields.push((x + 1, y));
-    } else {
-        count += 1;
-    }
-
-    for coords in fields {
-        if matrix[coords.0][coords.1] != matrix[x][y] {
-            count += 1;
-        } else {
-            count += bfs(matrix, visited, coords.0, coords.1);
-        }
-    }
-
-    return count;
 }
