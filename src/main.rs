@@ -1,11 +1,18 @@
 use num::integer::gcd;
 
+const COST_A: i64 = 3;
+const COST_B: i64 = 1;
+
 fn main() {
-    // Button A: X+94, Y+34
-    // Button B: X+22, Y+67
-    // Prize: X=8400, Y=5400
-    if is_valid(94, 22, 34, 67, 8400, 5400) {
-        find_cheapest(94, 22, 34, 67, 8400, 5400);
+    let x1 = 17;
+    let x2 = 84;
+    let y1 = 86;
+    let y2 = 37;
+    let target1 = 7870;
+    let target2 = 6450;
+
+    if is_valid(x1, x2, y1, y2, target1, target2) {
+        find_cheapest(x1, x2, y1, y2, target1, target2);
     }
 }
 
@@ -22,8 +29,8 @@ fn find_cheapest(x1: i64, x2: i64, y1: i64, y2: i64, target1: i64, target2: i64)
 
             if i * y2 + first_multiplier * y1 == target2 {
                 println!("{} + {}", first_multiplier, i);
-                println!("coins: {}", first_multiplier * 3 + i * 1);
-                break;
+                println!("coins: {}", first_multiplier * COST_A + i * COST_B);
+                // break;
             }
         }
         i += 1;
