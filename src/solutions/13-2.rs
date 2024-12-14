@@ -37,23 +37,14 @@ fn find_cheapest(game: &Game) -> i64 {
     let y2 = game.y2;
     let target2 = game.target2;
 
-    if ((x1 * target2) - (y1 * target1)) % ((x1 * y2) - (y1 * x2)) != 0
-        || ((x2 * target2) - (y2 * target1)) % ((x2 * y1) - (y2 * x1)) != 0
-    {
+    if ((x2 * target2) - (y2 * target1)) % ((x2 * y1) - (y2 * x1)) != 0 {
         return 0;
     }
-
-    let a1 = ((x1 * target2) - (y1 * target1)) / ((x1 * y2) - (y1 * x2));
-    let b1 = (target1 - (x2 * a1)) / x1;
 
     let a2 = ((x2 * target2) - (y2 * target1)) / ((x2 * y1) - (y2 * x1));
     let b2 = (target1 - (x1 * a2)) / x2;
 
     let cost2 = a2 * COST_A + b2 * COST_B;
-
-    if a1 < 0 || a2 < 0 || b1 < 0 || b2 < 0 {
-        return 0;
-    }
 
     println!("A2: {}, B2: {}, cost: {}", a2, b2, cost2);
     return cost2;
