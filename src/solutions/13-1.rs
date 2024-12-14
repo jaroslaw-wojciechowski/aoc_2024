@@ -35,8 +35,12 @@ fn find_cheapest(game: &Game) -> i64 {
             let first_multiplier = temp / game.x1;
 
             if i * game.y2 + first_multiplier * game.y1 == game.target2 {
-                println!("{} + {}", first_multiplier, i);
-                println!("coins: {}", first_multiplier * COST_A + i * COST_B);
+                println!(
+                    "A2: {}, B2: {}, cost: {}",
+                    first_multiplier,
+                    i,
+                    first_multiplier * COST_A + i * COST_B
+                );
                 return first_multiplier * COST_A + i * COST_B;
             }
         }
